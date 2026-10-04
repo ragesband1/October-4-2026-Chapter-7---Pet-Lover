@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 7 - Pet Lover</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    overflow: hidden;
+    background: #111;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+}
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 20%, #ffe6ef 0%, #d99aaa 25%, #70404e 55%, #17131b 100%);
+}
+
+/* =========================
+   3D WORLD
+========================= */
+
+#world {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    perspective: 900px;
+}
+
+.sky {
+    position: absolute;
+    inset: 0 0 45% 0;
+    background: linear-gradient(
+        #1e1630,
+        #3b2347 45%,
+        #7e4d5c 75%,
+        #d18b94
+    );
+}
+
+.moon {
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: #fff5d6;
+    box-shadow: 0 0 40px #fff1b8;
+    top: 8%;
+    right: 12%;
+}
+
+.ground {
+    position: absolute;
+    left: -10%;
+    right: -10%;
+    bottom: -15%;
+    height: 65%;
+    transform: rotateX(55deg);
+    transform-origin: bottom;
+    background:
+        linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(#5b3a3b, #241d25);
+    background-size: 80px 80px;
+}
+
+.city {
+    position: absolute;
+    bottom: 35%;
+    left: 0;
+    right: 0;
+    height: 220px;
+}
+
+.building {
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(90deg, #302633, #594052, #29212e);
+    border: 2px solid rgba(255,255,255,.08);
+    box-shadow: 0 0 20px rgba(0,0,0,.4);
+}
+
+.building:nth-child(1) {
+    left: 4%;
+    width: 150px;
+    height: 190px;
+}
+
+.building:nth-child(2) {
+    left: 22%;
+    width: 110px;
+    height: 145px;
+}
+
+.building:nth-child(3) {
+    right: 20%;
+    width: 180px;
+    height: 210px;
+}
+
+.building:nth-child(4) {
+    right: 3%;
+    width: 120px;
+    height: 165px;
+}
+
+.window {
+    position: absolute;
+    width: 12px;
+    height: 20px;
+    background: #ffd77c;
+    box-shadow: 0 0 10px #ffd77c;
+}
+
+/* =========================
+   MARKET
+========================= */
+
+.market {
+    position: absolute;
+    bottom: 37%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 420px;
+    height: 170px;
+    background: linear-gradient(90deg, #492c38, #70434d, #492c38);
+    border: 5px solid #291b26;
+    box-shadow: 0 20px 30px rgba(0,0,0,.5);
+}
+
+.marketRoof {
+    position: absolute;
+    left: -25px;
+    right: -25px;
+    top: -35px;
+    height: 45px;
+    background: repeating-linear-gradient(
+        45deg,
+        #d73c65,
+        #d73c65 30px,
+        #7c2040 30px,
+        #7c2040 60px
+    );
+    border-radius: 12px 12px 0 0;
+}
+
+.marketSign {
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff0f5;
+    color: #a52f53;
+    padding: 8px 30px;
+    font-weight: bold;
+    font-size: 20px;
+    border-radius: 8px;
+}
+
+.table {
+    position: absolute;
+    bottom: 15px;
+    left: 25px;
+    width: 120px;
+    height: 65px;
+    background: #653a31;
+    border-radius: 5px;
+}
+
+.flowers {
+    position: absolute;
+    top: -40px;
+    left: 10px;
+    font-size: 38px;
+}
+
+.chocolates {
+    position: absolute;
+    top: -35px;
+    right: 5px;
+    font-size: 35px;
+}
+
+/* =========================
+   PLAYER
+========================= */
+
+#player {
+    position: absolute;
+    width: 55px;
+    height: 90px;
+    left: 50%;
+    top: 65%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    transition: left .08s linear, top .08s linear;
+}
+
+.playerBody {
+    position: absolute;
+    bottom: 0;
+    left: 12px;
+    width: 32px;
+    height: 55px;
+    background: #394b76;
+    border-radius: 12px 12px 5px 5px;
+}
+
+.playerHead {
+    position: absolute;
+    top: 0;
+    left: 14px;
+    width: 28px;
+    height: 30px;
+    border-radius: 50%;
+    background: #c98f6f;
+}
+
+.playerHair {
+    position: absolute;
+    top: -4px;
+    left: 11px;
+    width: 34px;
+    height: 16px;
+    background: #2a1b1b;
+    border-radius: 50% 50% 30% 30%;
+}
+
+.leg {
+    position: absolute;
+    bottom: -25px;
+    width: 10px;
+    height: 30px;
+    background: #202334;
+}
+
+.leg.left {
+    left: 17px;
+}
+
+.leg.right {
+    right: 7px;
+}
+
+.playerName {
+    position: absolute;
+    top: -28px;
+    width: 100px;
+    left: -22px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 0 2px 3px black;
+}
+
+/* =========================
+   DOG DANNY
+========================= */
+
+#danny {
+    position: absolute;
+    width: 75px;
+    height: 60px;
+    left: 60%;
+    top: 61%;
+    z-index: 18;
+    display: none;
+}
+
+.dogBody {
+    position: absolute;
+    bottom: 5px;
+    left: 15px;
+    width: 48px;
+    height: 32px;
+    border-radius: 50%;
+    background: #9a6848;
+}
+
+.dogHead {
+    position: absolute;
+    left: 3px;
+    top: 5px;
+    width: 35px;
+    height: 32px;
+    border-radius: 50%;
+    background: #b47a51;
+}
+
+.dogEar {
+    position: absolute;
+    width: 15px;
+    height: 25px;
+    background: #6c442f;
+    border-radius: 50%;
+}
+
+.dogEar.left {
+    left: -3px;
+    top: 2px;
+    transform: rotate(-25deg);
+}
+
+.dogEar.right {
+    right: -2px;
+    top: 2px;
+    transform: rotate(25deg);
+}
+
+.dogEye {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #111;
+    top: 16px;
+}
+
+.dogEye.one {
+    left: 11px;
+}
+
+.dogEye.two {
+    right: 7px;
+}
+
+.dogTail {
+    position: absolute;
+    right: -8px;
+    bottom: 25px;
+    width: 25px;
+    height: 8px;
+    background: #9a6848;
+    border-radius: 50%;
+    transform: rotate(-35deg);
+}
+
+.dannyName {
+    position: absolute;
+    top: -20px;
+    width: 80px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* =========================
+   NPCs
+========================= */
+
+.npc {
+    position: absolute;
+    width: 45px;
+    height: 75px;
+    z-index: 15;
+}
+
+.npcHead {
+    position: absolute;
+    top: 0;
+    left: 10px;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: #c98d70;
+}
+
+.npcBody {
+    position: absolute;
+    top: 25px;
+    left: 5px;
+    width: 36px;
+    height: 48px;
+    border-radius: 10px;
+    background: #7e304d;
+}
+
+.npcLabel {
+    position: absolute;
+    top: -22px;
+    left: -30px;
+    width: 110px;
+    text-align: center;
+    font-size: 11px;
+}
+
+#seller {
+    left: 38%;
+    top: 59%;
+}
+
+#oldMan {
+    right: 30%;
+    top: 54%;
+}
+
+#villager {
+    left: 17%;
+    top: 62%;
+}
+
+/* =========================
+   ENEMY
+========================= */
+
+.enemy {
+    position: absolute;
+    width: 65px;
+    height: 70px;
+    z-index: 17;
+}
+
+.enemyBody {
+    position: absolute;
+    bottom: 0;
+    left: 12px;
+    width: 40px;
+    height: 48px;
+    background: #40263b;
+    border-radius: 15px;
+    border: 2px solid #c43867;
+}
+
+.enemyHead {
+    position: absolute;
+    top: 0;
+    left: 16px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #5a3044;
+}
+
+.enemyEye {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff365d;
+    top: 14px;
+    box-shadow: 0 0 10px #ff365d;
+}
+
+.enemyEye.one {
+    left: 9px;
+}
+
+.enemyEye.two {
+    right: 8px;
+}
+
+.enemyName {
+    position: absolute;
+    top: -23px;
+    width: 100px;
+    left: -17px;
+    text-align: center;
+    font-size: 11px;
+}
+
+/* =========================
+   HUD
+========================= */
+
+#hud {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 290px;
+    padding: 15px;
+    background: rgba(10,8,16,.82);
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 12px;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+}
+
+#hud h2 {
+    color: #ff8fb0;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.stat {
+    margin: 7px 0;
+}
+
+.bar {
+    height: 12px;
+    background: #29232e;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 3px;
+}
+
+#healthBar {
+    width: 100%;
+    height: 100%;
+    background: #e94366;
+}
+
+#xpBar {
+    width: 0%;
+    height: 100%;
+    background: #b879ff;
+}
+
+#hungerBar {
+    width: 100%;
+    height: 100%;
+    background: #f2b84b;
+}
+
+/* =========================
+   QUEST PANEL
+========================= */
+
+#questPanel {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 290px;
+    padding: 15px;
+    background: rgba(10,8,16,.82);
+    border-radius: 12px;
+    z-index: 100;
+    border: 1px solid rgba(255,255,255,.15);
+}
+
+#questPanel h3 {
+    color: #ffb6ca;
+    margin-bottom: 8px;
+}
+
+.questDone {
+    color: #72f5a5;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+#controls {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 100;
+    display: grid;
+    grid-template-columns: repeat(3, 55px);
+    gap: 6px;
+}
+
+.controlBtn {
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(20,15,25,.9);
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    border: 1px solid #704a60;
+}
+
+.controlBtn:active {
+    transform: scale(.92);
+}
+
+.empty {
+    visibility: hidden;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+#actions {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+}
+
+.action {
+    border: none;
+    background: #7d3154;
+    color: white;
+    padding: 13px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    border: 1px solid #d87396;
+}
+
+.action:hover {
+    background: #a64169;
+}
+
+/* =========================
+   STORY SCREEN
+========================= */
+
+#storyScreen {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,7,13,.96);
+    z-index: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+}
+
+.storyBox {
+    width: min(900px, 95vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 35px;
+    background: linear-gradient(135deg, #261923, #492738);
+    border: 2px solid #bc5d7c;
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(196,65,108,.25);
+}
+
+.storyBox h1 {
+    color: #ff9eba;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.storyBox h2 {
+    text-align: center;
+    color: #e6bfd0;
+    margin-bottom: 20px;
+}
+
+.storyBox .date {
+    text-align: center;
+    color: #d9a7b9;
+    margin-bottom: 25px;
+}
+
+.storyBox p {
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: #f7e9ee;
+}
+
+.moral {
+    padding: 20px;
+    background: rgba(207,75,113,.15);
+    border-left: 5px solid #e7658d;
+    margin-top: 20px;
+}
+
+.startBtn {
+    display: block;
+    margin: 25px auto 0;
+    padding: 15px 35px;
+    background: #d04c78;
+    border: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+/* =========================
+   DIALOG
+========================= */
+
+#dialog {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(750px, 90vw);
+    padding: 18px;
+    background: rgba(12,9,15,.94);
+    border: 1px solid #b94d73;
+    border-radius: 15px;
+    z-index: 300;
+    display: none;
+}
+
+#dialogName {
+    color: #ff91b1;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+#dialogText {
+    line-height: 1.5;
+}
+
+/* =========================
+   INVENTORY
+========================= */
+
+#inventory {
+    position: absolute;
+    inset: 0;
+    z-index: 450;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,.75);
+}
+
+.inventoryBox {
+    width: 600px;
+    max-width: 90vw;
+    background: #211722;
+    border: 2px solid #a65070;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.inventoryGrid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.item {
+    min-height: 85px;
+    background: #332331;
+    border: 1px solid #684258;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.closeBtn {
+    float: right;
+    background: #8f3559;
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+/* =========================
+   SKILLS
+========================= */
+
+#skills {
+    position: absolute;
+    inset: 0;
+    z-index: 450;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,.75);
+}
+
+.skillsBox {
+    width: 650px;
+    max-width: 92vw;
+    background: #211722;
+    border: 2px solid #a65070;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.skill {
+    padding: 15px;
+    margin-top: 10px;
+    background: #332331;
+    border-radius: 10px;
+}
+
+.skill button {
+    float: right;
+    background: #c34e78;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* =========================
+   MINIMAP
+========================= */
+
+#minimap {
+    position: absolute;
+    right: 20px;
+    bottom: 120px;
+    width: 150px;
+    height: 110px;
+    background: rgba(20,15,25,.85);
+    border: 2px solid #7c5064;
+    border-radius: 10px;
+    z-index: 100;
+}
+
+.mapDot {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.playerDot {
+    background: white;
+    left: 50%;
+    top: 50%;
+}
+
+.enemyDot {
+    background: red;
+}
+
+/* =========================
+   VICTORY
+========================= */
+
+#victory {
+    position: absolute;
+    inset: 0;
+    background: rgba(14,8,14,.95);
+    z-index: 600;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.victoryBox {
+    max-width: 700px;
+    padding: 40px;
+}
+
+.victoryBox h1 {
+    color: #ff91b1;
+    font-size: 45px;
+    margin-bottom: 20px;
+}
+
+.victoryBox p {
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+@media(max-width:700px) {
+    #hud,
+    #questPanel {
+        width: 220px;
+        font-size: 12px;
+    }
+
+    #questPanel {
+        display: none;
+    }
+
+    #actions {
+        flex-wrap: wrap;
+        width: 190px;
+        right: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+    <!-- =========================
+         WORLD
+    ========================== -->
+
+    <div id="world">
+
+        <div class="sky"></div>
+        <div class="moon"></div>
+
+        <div class="city">
+            <div class="building"></div>
+            <div class="building"></div>
+            <div class="building"></div>
+            <div class="building"></div>
+        </div>
+
+        <div class="ground"></div>
+
+        <div class="market">
+            <div class="marketRoof"></div>
+            <div class="marketSign">PET LOVER</div>
+
+            <div class="table">
+                <div class="flowers">💐</div>
+                <div class="chocolates">🍫</div>
+            </div>
+        </div>
+
+        <!-- PLAYER -->
+
+        <div id="player">
+            <div class="playerName">Vaki</div>
+            <div class="playerHead"></div>
+            <div class="playerHair"></div>
+            <div class="playerBody"></div>
+            <div class="leg left"></div>
+            <div class="leg right"></div>
+        </div>
+
+        <!-- DANNY -->
+
+        <div id="danny">
+            <div class="dannyName">Danny 🐶</div>
+            <div class="dogHead">
+                <div class="dogEye one"></div>
+                <div class="dogEye two"></div>
+                <div class="dogEar left"></div>
+                <div class="dogEar right"></div>
+            </div>
+            <div class="dogBody"></div>
+            <div class="dogTail"></div>
+        </div>
+
+        <!-- NPCs -->
+
+        <div class="npc" id="seller">
+            <div class="npcLabel">Pet Seller</div>
+            <div class="npcHead"></div>
+            <div class="npcBody"></div>
+        </div>
+
+        <div class="npc" id="oldMan">
+            <div class="npcLabel">Wise Man</div>
+            <div class="npcHead"></div>
+            <div class="npcBody"></div>
+        </div>
+
+        <div class="npc" id="villager">
+            <div class="npcLabel">Villager</div>
+            <div class="npcHead"></div>
+            <div class="npcBody"></div>
+        </div>
+
+        <!-- ENEMY -->
+
+        <div class="enemy" id="enemy1" style="left:72%;top:55%;">
+            <div class="enemyName">Greed Shadow</div>
+            <div class="enemyHead">
+                <div class="enemyEye one"></div>
+                <div class="enemyEye two"></div>
+            </div>
+            <div class="enemyBody"></div>
+        </div>
+
+    </div>
+
+    <!-- =========================
+         HUD
+    ========================== -->
+
+    <div id="hud">
+        <h2>🐾 Chapter 7 - Pet Lover</h2>
+
+        <div>Player: <b>Vaki</b></div>
+        <div>Level: <span id="level">1</span></div>
+
+        <div class="stat">
+            ❤️ Health
+            <div class="bar">
+                <div id="healthBar"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            🍖 Danny's Hunger
+            <div class="bar">
+                <div id="hungerBar"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            ⭐ Experience
+            <div class="bar">
+                <div id="xpBar"></div>
+            </div>
+        </div>
+
+        <div>
+            💰 Money: $<span id="money">100</span>
+        </div>
+
+        <div>
+            ⭐ Skill Points: <span id="skillPoints">0</span>
+        </div>
+    </div>
+
+    <!-- QUEST -->
+
+    <div id="questPanel">
+        <h3>📜 Main Quest</h3>
+        <div id="questText">
+            Talk to the Pet Seller.
+        </div>
+
+        <hr style="margin:10px 0;border-color:#5d4050;">
+
+        <small>
+            Valentine's Day — February 14, 2020
+        </small>
+    </div>
+
+    <!-- MINIMAP -->
+
+    <div id="minimap">
+        <div class="mapDot playerDot"></div>
+        <div class="mapDot enemyDot" style="left:75%;top:30%;"></div>
+    </div>
+
+    <!-- CONTROLS -->
+
+    <div id="controls">
+        <button class="controlBtn empty"></button>
+        <button class="controlBtn" onclick="move(0,-1)">▲</button>
+        <button class="controlBtn empty"></button>
+
+        <button class="controlBtn" onclick="move(-1,0)">◀</button>
+        <button class="controlBtn" onclick="interact()">◎</button>
+        <button class="controlBtn" onclick="move(1,0)">▶</button>
+
+        <button class="controlBtn empty"></button>
+        <button class="controlBtn" onclick="move(0,1)">▼</button>
+        <button class="controlBtn empty"></button>
+    </div>
+
+    <!-- ACTIONS -->
+
+    <div id="actions">
+        <button class="action" onclick="interact()">INTERACT</button>
+        <button class="action" onclick="feedDanny()">FEED 🐶</button>
+        <button class="action" onclick="attack()">ATTACK ⚔</button>
+        <button class="action" onclick="openInventory()">BAG 🎒</button>
+        <button class="action" onclick="openSkills()">SKILLS ⭐</button>
+    </div>
+
+    <!-- DIALOG -->
+
+    <div id="dialog">
+        <div id="dialogName"></div>
+        <div id="dialogText"></div>
+    </div>
+
+    <!-- STORY SCREEN -->
+
+    <div id="storyScreen">
+
+        <div class="storyBox">
+
+            <h1>Chapter 7: Bedtime Stories</h1>
+
+            <h2>Pet Lover</h2>
+
+            <div class="date">
+                February 14 2020
+                <br>
+                From the creations of Valentine Animals And “The Rages Band”
+            </div>
+
+            <p>
+                Once upon a time in the evening and relaxing morning. People here is celebrating the valentines date in February 14 which is today. And then people within the market used to sell those bouquet of flowers and chocolates when the person came to buy it.
+            </p>
+
+            <p>
+                The person named Vaki the adult man instead of having a such person in his life. He only wants pet lover and not the human lover. Though his not interesting to find his special someone due to his break ups.
+            </p>
+
+            <p>
+                But he wanted to buy the pets in the market of “Pet Lover”. Because pets in here are the wise creatures that can understand without break up pets. Or should we say you can’t live the pets in your own life.
+            </p>
+
+            <p>
+                Vaki buyed the pet on his own. He buy the buddy with the fur that makes him cuddles on his own skin. And named the pet Danny the dog pet and the dog fighter with just 1 year old dog.
+            </p>
+
+            <p>
+                As Vaki buy it. For almost years passed 20 years Vaki forgot to save his own pet by feeding. Because of too much greed of making money. He don’t realized that pet lover Danny is guilty because of not feeding it’s tummy.
+            </p>
+
+            <p>
+                Danny the dog denied to take care Vaki and go away as a pet. Vaki knows it and realized.
+            </p>
+
+            <p>
+                If you wanted a pet lover to take care you. You should think instead to be yourself but what your pet wants to care of.
+            </p>
+
+            <div class="moral">
+
+                <strong>🐾 Moral Lesson:</strong>
+
+                <p>
+                    Buying the pet shall not been careless on his own. As a pet you need to take care of it. Or else there’s no valentines if the pet goes away. Because you only taking a greed of it on yourself and not what pet’s care want.
+                </p>
+
+            </div>
+
+            <button class="startBtn" onclick="startGame()">
+                ▶ START CHAPTER 7
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- INVENTORY -->
+
+    <div id="inventory">
+
+        <div class="inventoryBox">
+
+            <button class="closeBtn" onclick="closeInventory()">CLOSE</button>
+
+            <h2>🎒 Inventory & Equipment</h2>
+
+            <div class="inventoryGrid">
+
+                <div class="item">
+                    🦴
+                    <br>
+                    Dog Food
+                    <br>
+                    x<span id="foodCount">3</span>
+                </div>
+
+                <div class="item">
+                    💐
+                    <br>
+                    Valentine Flowers
+                </div>
+
+                <div class="item">
+                    🍫
+                    <br>
+                    Chocolate
+                </div>
+
+                <div class="item">
+                    🪙
+                    <br>
+                    Coins
+                    <br>
+                    $<span id="bagMoney">100</span>
+                </div>
+
+                <div class="item">
+                    ⚔
+                    <br>
+                    Caretaker Sword
+                </div>
+
+                <div class="item">
+                    🐾
+                    <br>
+                    Danny's Collar
+                </div>
+
+                <div class="item">
+                    ❤️
+                    <br>
+                    Pet Lover Badge
+                </div>
+
+                <div class="item">
+                    📜
+                    <br>
+                    Story Book
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SKILLS -->
+
+    <div id="skills">
+
+        <div class="skillsBox">
+
+            <button class="closeBtn" onclick="closeSkills()">CLOSE</button>
+
+            <h2>⭐ Pet Lover Skill Tree</h2>
+
+            <p>
+                Skill Points:
+                <b id="skillPoints2">0</b>
+            </p>
+
+            <div class="skill">
+                <b>❤️ Caring Heart</b>
+                <br>
+                Increases Danny's hunger recovery.
+                <button onclick="buySkill('care')">BUY</button>
+            </div>
+
+            <div class="skill">
+                <b>⚔ Guardian</b>
+                <br>
+                Increases attack damage.
+                <button onclick="buySkill('guardian')">BUY</button>
+            </div>
+
+            <div class="skill">
+                <b>💰 Responsible Worker</b>
+                <br>
+                Increases money earned from quests.
+                <button onclick="buySkill('money')">BUY</button>
+            </div>
+
+            <div class="skill">
+                <b>🐾 Animal Bond</b>
+                <br>
+                Strengthens Vaki and Danny's bond.
+                <button onclick="buySkill('bond')">BUY</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- VICTORY -->
+
+    <div id="victory">
+
+        <div class="victoryBox">
+
+            <h1>🐾 Chapter Complete!</h1>
+
+            <h2>Pet Lover</h2>
+
+            <p>
+                Vaki finally understood that owning a pet is not simply about buying one.
+                A pet needs food, care, attention, responsibility, and love.
+            </p>
+
+            <p>
+                Danny's lesson changed Vaki's heart.
+            </p>
+
+            <p>
+                <b>
+                    “If you wanted a pet lover to take care of you,
+                    you should think about what your pet wants you to care for.”
+                </b>
+            </p>
+
+            <button class="startBtn" onclick="location.reload()">
+                PLAY AGAIN
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =====================================
+   GAME VARIABLES
+===================================== */
+
+let gameStarted = false;
+
+let player = {
+    x: 50,
+    y: 65,
+    health: 100,
+    maxHealth: 100,
+    level: 1,
+    xp: 0,
+    money: 100,
+    skillPoints: 0,
+    damage: 10
+};
+
+let danny = {
+    hunger: 100,
+    maxHunger: 100,
+    present: false,
+    trust: 0
+};
+
+let inventory = {
+    food: 3
+};
+
+let quests = {
+    talkSeller: false,
+    buyDanny: false,
+    meetDanny: false,
+    feedDanny: false,
+    defeatShadow: false,
+    complete: false
+};
+
+let skills = {
+    care: false,
+    guardian: false,
+    money: false,
+    bond: false
+};
+
+let enemy = {
+    health: 80,
+    maxHealth: 80,
+    alive: true
+};
+
+
+/* =====================================
+   START GAME
+===================================== */
+
+function startGame() {
+
+    document.getElementById("storyScreen").style.display = "none";
+
+    gameStarted = true;
+
+    updateQuest(
+        "Talk to the Pet Seller at the Pet Lover market."
+    );
+
+    showDialog(
+        "Narrator",
+        "Valentine's Day begins. Vaki enters the Pet Lover market."
+    );
+}
+
+
+/* =====================================
+   MOVEMENT
+===================================== */
+
+function move(dx, dy) {
+
+    if (!gameStarted) return;
+
+    player.x += dx * 3;
+    player.y += dy * 2;
+
+    player.x = Math.max(5, Math.min(95, player.x));
+    player.y = Math.max(42, Math.min(90, player.y));
+
+    updatePlayerPosition();
+
+    checkNearby();
+}
+
+
+function updatePlayerPosition() {
+
+    const p = document.getElementById("player");
+
+    p.style.left = player.x + "%";
+    p.style.top = player.y + "%";
+}
+
+
+/* =====================================
+   KEYBOARD CONTROLS
+===================================== */
+
+document.addEventListener("keydown", function(e) {
+
+    if (!gameStarted) return;
+
+    if (
+        e.key === "ArrowUp" ||
+        e.key.toLowerCase() === "w"
+    ) {
+        move(0,-1);
+    }
+
+    if (
+        e.key === "ArrowDown" ||
+        e.key.toLowerCase() === "s"
+    ) {
+        move(0,1);
+    }
+
+    if (
+        e.key === "ArrowLeft" ||
+        e.key.toLowerCase() === "a"
+    ) {
+        move(-1,0);
+    }
+
+    if (
+        e.key === "ArrowRight" ||
+        e.key.toLowerCase() === "d"
+    ) {
+        move(1,0);
+    }
+
+    if (e.key === "e") {
+        interact();
+    }
+
+    if (e.key === "f") {
+        feedDanny();
+    }
+
+    if (e.key === " ") {
+        attack();
+    }
+
+    if (e.key.toLowerCase() === "i") {
+        openInventory();
+    }
+
+    if (e.key.toLowerCase() === "k") {
+        openSkills();
+    }
+
+});
+
+
+/* =====================================
+   INTERACTION
+===================================== */
+
+function interact() {
+
+    if (!gameStarted) return;
+
+    const x = player.x;
+    const y = player.y;
+
+    /* PET SELLER */
+
+    if (
+        Math.abs(x - 38) < 10 &&
+        Math.abs(y - 59) < 10
+    ) {
+
+        quests.talkSeller = true;
+
+        showDialog(
+            "Pet Seller",
+            "Welcome to Pet Lover. On Valentine's Day, many people buy flowers and chocolates. But Vaki wants something different: a pet."
+        );
+
+        if (!quests.buyDanny) {
+
+            setTimeout(() => {
+
+                buyDanny();
+
+            }, 2500);
+
+        }
+
+        return;
+    }
+
+    /* DANNY */
+
+    if (
+        danny.present &&
+        Math.abs(x - 60) < 12 &&
+        Math.abs(y - 61) < 12
+    ) {
+
+        quests.meetDanny = true;
+
+        showDialog(
+            "Danny",
+            "Woof! 🐶 Danny looks at Vaki and waits for food, care, and attention."
+        );
+
+        updateQuest(
+            "Feed Danny using the FEED button."
+        );
+
+        return;
+    }
+
+    /* WISE MAN */
+
+    if (
+        Math.abs(x - 70) < 10 &&
+        Math.abs(y - 54) < 12
+    ) {
+
+        showDialog(
+            "Wise Man",
+            "A pet is not a decoration. If you bring an animal into your life, you must also accept responsibility for its life."
+        );
+
+        return;
+    }
+
+    /* VILLAGER */
+
+    if (
+        Math.abs(x - 17) < 10 &&
+        Math.abs(y - 62) < 12
+    ) {
+
+        showDialog(
+            "Villager",
+            "Valentine's Day is about love. Remember that love also means taking care of those who depend on you."
+        );
+
+        return;
+    }
+
+    /* ENEMY */
+
+    if (
+        Math.abs(x - 72) < 12 &&
+        Math.abs(y - 55) < 12 &&
+        enemy.alive
+    ) {
+
+        showDialog(
+            "Greed Shadow",
+            "Your greed has blinded you. Fight me if you want to understand responsibility!"
+        );
+
+        return;
+    }
+}
+
+
+/* =====================================
+   BUY DANNY
+===================================== */
+
+function buyDanny() {
+
+    if (quests.buyDanny) return;
+
+    quests.buyDanny = true;
+
+    danny.present = true;
+
+    document.getElementById("danny").style.display = "block";
+
+    player.money -= 40;
+
+    document.getElementById("money").innerText =
+        player.money;
+
+    document.getElementById("bagMoney").innerText =
+        player.money;
+
+    showDialog(
+        "Vaki",
+        "I will name you Danny. You will be my pet companion."
+    );
+
+    updateQuest(
+        "Find Danny and interact with him."
+    );
+}
+
+
+/* =====================================
+   FEED DANNY
+===================================== */
+
+function feedDanny() {
+
+    if (!gameStarted) return;
+
+    if (!danny.present) {
+
+        showDialog(
+            "Narrator",
+            "Danny has not been bought yet."
+        );
+
+        return;
+    }
+
+    if (inventory.food <= 0) {
+
+        showDialog(
+            "Inventory",
+            "You have no dog food left."
+        );
+
+        return;
+    }
+
+    inventory.food--;
+
+    danny.hunger += skills.care ? 35 : 25;
+
+    danny.hunger =
+        Math.min(danny.maxHunger, danny.hunger);
+
+    danny.trust += skills.bond ? 20 : 10;
+
+    quests.feedDanny = true;
+
+    document.getElementById("foodCount").innerText =
+        inventory.food;
+
+    updateHunger();
+
+    showDialog(
+        "Danny",
+        "Woof! 🐶 Thank you for feeding me!"
+    );
+
+    if (danny.trust >= 20) {
+
+        player.xp += 20;
+
+        checkLevel();
+
+        updateQuest(
+            "Defeat the Greed Shadow to learn the final lesson."
+        );
+
+        showDialog(
+            "Narrator",
+            "Danny trusts Vaki. But Vaki must still learn that caring for a pet requires responsibility."
+        );
+    }
+}
+
+
+/* =====================================
+   COMBAT
+===================================== */
+
+function attack() {
+
+    if (!gameStarted) return;
+
+    if (!enemy.alive) {
+
+        showDialog(
+            "Narrator",
+            "The Greed Shadow has already been defeated."
+        );
+
+        return;
+    }
+
+    const closeEnough =
+        Math.abs(player.x - 72) < 16 &&
+        Math.abs(player.y - 55) < 15;
+
+    if (!closeEnough) {
+
+        showDialog(
+            "Combat",
+            "Move closer to the Greed Shadow before attacking."
+        );
+
+        return;
+    }
+
+    let damage =
+        player.damage +
+        (skills.guardian ? 10 : 0);
+
+    enemy.health -= damage;
+
+    showDialog(
+        "Vaki",
+        "I will fight the greed that made me forget Danny!"
+    );
+
+    if (enemy.health <= 0) {
+
+        enemy.health = 0;
+
+        enemy.alive = false;
+
+        document.getElementById("enemy1").style.display =
+            "none";
+
+        quests.defeatShadow = true;
+
+        player.xp += 50;
+
+        player.skillPoints += 1;
+
+        checkLevel();
+
+        updateQuest(
+            "Return to Danny and complete the moral lesson."
+        );
+
+        showDialog(
+            "Narrator",
+            "The Greed Shadow disappears. Vaki realizes that earning money is not more important than caring for Danny."
+        );
+
+        return;
+    }
+
+    setTimeout(() => {
+
+        enemyAttack();
+
+    }, 500);
+}
+
+
+/* =====================================
+   ENEMY ATTACK
+===================================== */
+
+function enemyAttack() {
+
+    if (!enemy.alive) return;
+
+    player.health -= 8;
+
+    player.health =
+        Math.max(0, player.health);
+
+    updateHealth();
+
+    if (player.health <= 0) {
+
+        player.health = 100;
+
+        showDialog(
+            "Narrator",
+            "Vaki was defeated. But the lesson remains. Try again."
+        );
+
+        return;
+    }
+
+    showDialog(
+        "Greed Shadow",
+        "Greed makes people forget what truly matters!"
+    );
+}
+
+
+/* =====================================
+   LEVEL SYSTEM
+===================================== */
+
+function checkLevel() {
+
+    const neededXP =
+        player.level * 50;
+
+    if (player.xp >= neededXP) {
+
+        player.xp -= neededXP;
+
+        player.level++;
+
+        player.skillPoints++;
+
+        showDialog(
+            "Level Up!",
+            "Vaki reached Level " + player.level +
+            " and earned a Skill Point!"
+        );
+    }
+
+    updateHUD();
+}
+
+
+/* =====================================
+   SKILL TREE
+===================================== */
+
+function openSkills() {
+
+    document.getElementById("skills").style.display =
+        "flex";
+
+    document.getElementById("skillPoints2").innerText =
+        player.skillPoints;
+}
+
+
+function closeSkills() {
+
+    document.getElementById("skills").style.display =
+        "none";
+}
+
+
+function buySkill(skill) {
+
+    if (player.skillPoints <= 0) {
+
+        showDialog(
+            "Skill Tree",
+            "You need a Skill Point."
+        );
+
+        return;
+    }
+
+    if (skills[skill]) {
+
+        showDialog(
+            "Skill Tree",
+            "You already unlocked this skill."
+        );
+
+        return;
+    }
+
+    skills[skill] = true;
+
+    player.skillPoints--;
+
+    if (skill === "guardian") {
+        player.damage += 10;
+    }
+
+    if (skill === "care") {
+        danny.hunger =
+            Math.min(100, danny.hunger + 10);
+    }
+
+    if (skill === "bond") {
+        danny.trust += 10;
+    }
+
+    document.getElementById("skillPoints").innerText =
+        player.skillPoints;
+
+    document.getElementById("skillPoints2").innerText =
+        player.skillPoints;
+
+    showDialog(
+        "Skill Tree",
+        "Skill unlocked successfully!"
+    );
+}
+
+
+/* =====================================
+   INVENTORY
+===================================== */
+
+function openInventory() {
+
+    document.getElementById("inventory").style.display =
+        "flex";
+
+    document.getElementById("foodCount").innerText =
+        inventory.food;
+
+    document.getElementById("bagMoney").innerText =
+        player.money;
+}
+
+
+function closeInventory() {
+
+    document.getElementById("inventory").style.display =
+        "none";
+}
+
+
+/* =====================================
+   DIALOG SYSTEM
+===================================== */
+
+let dialogTimer;
+
+function showDialog(name, text) {
+
+    const dialog =
+        document.getElementById("dialog");
+
+    document.getElementById("dialogName").innerText =
+        name;
+
+    document.getElementById("dialogText").innerText =
+        text;
+
+    dialog.style.display = "block";
+
+    clearTimeout(dialogTimer);
+
+    dialogTimer = setTimeout(() => {
+
+        dialog.style.display = "none";
+
+    }, 5000);
+}
+
+
+/* =====================================
+   QUEST SYSTEM
+===================================== */
+
+function updateQuest(text) {
+
+    document.getElementById("questText").innerText =
+        text;
+}
+
+
+/* =====================================
+   HUD
+===================================== */
+
+function updateHealth() {
+
+    const percentage =
+        (player.health / player.maxHealth) * 100;
+
+    document.getElementById("healthBar").style.width =
+        percentage + "%";
+}
+
+
+function updateHunger() {
+
+    const percentage =
+        (danny.hunger / danny.maxHunger) * 100;
+
+    document.getElementById("hungerBar").style.width =
+        percentage + "%";
+}
+
+
+function updateHUD() {
+
+    document.getElementById("level").innerText =
+        player.level;
+
+    document.getElementById("money").innerText =
+        player.money;
+
+    document.getElementById("skillPoints").innerText =
+        player.skillPoints;
+
+    document.getElementById("skillPoints2").innerText =
+        player.skillPoints;
+
+    const xpNeeded =
+        player.level * 50;
+
+    const xpPercentage =
+        Math.min(
+            100,
+            (player.xp / xpNeeded) * 100
+        );
+
+    document.getElementById("xpBar").style.width =
+        xpPercentage + "%";
+
+    updateHealth();
+    updateHunger();
+}
+
+
+/* =====================================
+   NEARBY CHECK
+===================================== */
+
+function checkNearby() {
+
+    if (
+        quests.defeatShadow &&
+        danny.present &&
+        Math.abs(player.x - 60) < 12 &&
+        Math.abs(player.y - 61) < 12
+    ) {
+
+        completeChapter();
+
+    }
+}
+
+
+/* =====================================
+   CHAPTER COMPLETION
+===================================== */
+
+function completeChapter() {
+
+    if (quests.complete) return;
+
+    quests.complete = true;
+
+    document.getElementById("victory").style.display =
+        "flex";
+
+    updateQuest(
+        "Chapter 7 Complete!"
+    );
+}
+
+
+/* =====================================
+   DANNY HUNGER TIMER
+===================================== */
+
+setInterval(() => {
+
+    if (!gameStarted || !danny.present) return;
+
+    danny.hunger--;
+
+    danny.hunger =
+        Math.max(0, danny.hunger);
+
+    updateHunger();
+
+    if (danny.hunger <= 20) {
+
+        showDialog(
+            "Danny",
+            "Woof... I'm hungry. Please take care of me."
+        );
+
+    }
+
+}, 5000);
+
+
+/* =====================================
+   RANDOM VALENTINE ATMOSPHERE
+===================================== */
+
+setInterval(() => {
+
+    if (!gameStarted) return;
+
+    const heart = document.createElement("div");
+
+    heart.innerText = "❤️";
+
+    heart.style.position = "absolute";
+    heart.style.left =
+        Math.random() * 100 + "%";
+    heart.style.top = "100%";
+    heart.style.zIndex = "50";
+    heart.style.pointerEvents = "none";
+    heart.style.fontSize =
+        (12 + Math.random() * 18) + "px";
+    heart.style.transition =
+        "top 5s linear, opacity 5s linear";
+
+    document.getElementById("game")
+        .appendChild(heart);
+
+    setTimeout(() => {
+
+        heart.style.top =
+            (20 + Math.random() * 40) + "%";
+
+        heart.style.opacity = "0";
+
+    }, 50);
+
+    setTimeout(() => {
+
+        heart.remove();
+
+    }, 5200);
+
+}, 1200);
+
+
+/* =====================================
+   INITIALIZE
+===================================== */
+
+updatePlayerPosition();
+updateHUD();
+
+</script>
+
+</body>
+</html>
